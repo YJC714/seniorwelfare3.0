@@ -1,0 +1,12 @@
+streamlit
+pandas
+python-barcode[pillow]
+Pillow
+pydeck
+streamlit-javascript
+plotly
+streamlit>=1.30
+pandas
+plotly
+streamlit-javascript
+pydeck
