@@ -1,0 +1,14 @@
+{
+  "admin": {
+    "password": "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92",
+    "name": "系統管理員",
+    "role": "admin",
+    "active": true
+  },
+  "wang": {
+    "password": "4a3e11c20cc03038b9549fa239bbf403968799c134436e7e58162a0a4f7644f9",
+    "name": "模擬帳號 個管師",
+    "role": "case_manager",
+    "active": true
+  }
+}
