@@ -203,7 +203,8 @@ if st.session_state.page == "運動紀錄":
             elif prescription.get("status") == "已完成":
                 st.info("已完成")
             else:
-                st.warning("尚未開立")
+              #  st.warning("尚未開立")
+                st.success("進行中")
         with col2:
             st.write(f"開立日期：{prescription['開立日期']}　｜　個管師：{prescription['個管師']}")
         
@@ -440,6 +441,7 @@ elif st.session_state.page == "活動推廣":
 #elif st.session_state.page == "報名紀錄":
 
 #    st.header("報名紀錄")
+
 
 
 
