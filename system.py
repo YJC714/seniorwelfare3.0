@@ -52,11 +52,17 @@ st.session_state.user_name = user.get("name", "長者")
 case_manager_id = user.get("case_manager")  # 例如 "wang", "lily123", None
 
 # 取得該個管師為這位長者開的處方（取最新一筆）
-prescription = None
-if case_manager_id and case_manager_id in prescriptions_all:
-    patient_pres_list = prescriptions_all[case_manager_id].get(CURRENT_PATIENT_ID, [])
-    if patient_pres_list:
-        prescription = patient_pres_list[-1]  # 最新一筆
+#prescription = None
+#if case_manager_id and case_manager_id in prescriptions_all:
+ #   patient_pres_list = prescriptions_all[case_manager_id].get(CURRENT_PATIENT_ID, [])
+  #  if patient_pres_list:
+   #     prescription = patient_pres_list[-1]  # 最新一筆
+
+ prescription = {
+        "開立日期": "2025-12-9",
+        "個管師": user.get("case_manager", "王小明") ,
+        "處方內容": ["每天散步20分鐘\n坐在椅子上做起立訓練，一天20下\n每周至少參加1次社區活動或課程訓練"]
+    }
 
 # 如果沒有處方箋，就顯示預設訊息
 if not prescription:
@@ -435,6 +441,7 @@ elif st.session_state.page == "活動推廣":
 #elif st.session_state.page == "報名紀錄":
 
 #    st.header("報名紀錄")
+
 
 
 
