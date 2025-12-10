@@ -472,86 +472,54 @@ elif st.session_state.page == "帳號審核" and user_role == "admin":
     admin_approval_page()
 elif st.session_state.page == "運動核可":
     st.header("長者運動回報核可")
-    
-    
-    patient_name = "王聖德"
 
-    exercise_logs = [
-        {"time": "2025-12-10 09:30", "content": "快走 20 分鐘"},
-        {"time": "2025-12-10 14:10", "content": "彈力帶手臂訓練 10 分鐘"},
-        {"time": "2025-12-10 19:00", "content": "深蹲 15 下 × 3 組"}
-    ]
+    # 選擇病人
+    patient_options = {pid: f"{info['name']} ({pid})" for pid, info in patients_data.items() 
+                      if info.get("case_manager") == username}
     
-    # === 顯示每一筆回報 ===
-    for i, log in enumerate(exercise_logs):
-        with st.container(border=True):
-            col1, col2, col3, col4 = st.columns([2, 2, 3, 1])
-    
-            with col1:
-                st.write(f"**患者：**{patient_name}")
-    
-            with col2:
-                st.write(f"**時間：**{log['time']}")
-    
-            with col3:
-                st.write(f"**運動內容：**{log['content']}")
-    
-            with col4:
-                if st.button("核可", key=f"approve_{i}", use_container_width=True):
-                    st.success(f"已核可：{log['time']} 的回報")
+    if not patient_options:
+        st.warning("您目前沒有負責的長者")
+        st.stop()
 
+    selected_pid = st.selectbox("選擇長者", options=list(patient_options.keys()),
+                                format_func=lambda x: patient_options[x])
 
-    # # 選擇病人
-    # patient_options = {pid: f"{info['name']} ({pid})" for pid, info in patients_data.items() 
-    #                   if info.get("case_manager") == username}
-    
-    # if not patient_options:
-    #     st.warning("您目前沒有負責的長者")
-    #     st.stop()
+    records = all_records.get(selected_pid, [])
+    if not records:
+        st.info("這位長者還沒有運動紀錄")
+    else:
+        pending = [r for r in records if not r.get("approved", False)]
+        st.metric("待核可筆數", len(pending))
 
-    # selected_pid = st.selectbox("選擇長者", options=list(patient_options.keys()),
-    #                             format_func=lambda x: patient_options[x])
-
-    # records = all_records.get(selected_pid, [])
-    # if not records:
-    #     st.info("這位長者還沒有運動紀錄")
-    # else:
-    #     pending = [r for r in records if not r.get("approved", False)]
-    #     st.metric("待核可筆數", len(pending))
-
-    #     for record in records:
-    #         approved = record.get("approved", False)
-    #         with st.container(border=True):
-    #             col1, col2, col3 = st.columns([3, 2, 2])
-    #             with col1:
-    #                 status = "已核可" if approved else "待核可"
-    #                 color = "green" if approved else "orange"
-    #                 st.markdown(f"**{record['date']}**　{record['exercise']}　{record['minutes']} 分鐘　→　{record['points_base']} 點")
-    #                 st.markdown(f"<span style='color:{color}'>● {status}</span>", unsafe_allow_html=True)
-    #             with col2:
-    #                 st.write(f"已發放：{record['points_auto']} 點（60%）")
-    #                 if not approved:
-    #                     st.write(f"待補發：{record['points_pending']} 點（40%）")
-    #                 else:
-    #                     st.write(f"已補發：{record['points_pending']} 點")
-    #             with col3:
-    #                 if not approved:
-    #                     if st.button("核可發放", key=f"approve_{selected_pid}_{record['date']}_{record['exercise']}"):
-    #                         # 執行核可
-    #                         record["approved"] = True
-    #                         record["approved_at"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        for record in records:
+            approved = record.get("approved", False)
+            with st.container(border=True):
+                col1, col2, col3 = st.columns([3, 2, 2])
+                with col1:
+                    status = "已核可" if approved else "待核可"
+                    color = "green" if approved else "orange"
+                    st.markdown(f"**{record['date']}**　{record['exercise']}　{record['minutes']} 分鐘　→　{record['points_base']} 點")
+                    st.markdown(f"<span style='color:{color}'>● {status}</span>", unsafe_allow_html=True)
+                with col2:
+                    st.write(f"已發放：{record['points_auto']} 點（60%）")
+                    if not approved:
+                        st.write(f"待補發：{record['points_pending']} 點（40%）")
+                    else:
+                        st.write(f"已補發：{record['points_pending']} 點")
+                with col3:
+                    if not approved:
+                        if st.button("核可發放", key=f"approve_{selected_pid}_{record['date']}_{record['exercise']}"):
+                            # 執行核可
+                            record["approved"] = True
+                            record["approved_at"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
                             
-    #                         # 更新病人點數
-    #                         patients_data[selected_pid]["total_points_pending"] -= record['points_pending']
-    #                         patients_data[selected_pid]["total_points_approved"] += record['points_pending']
-    #                         patients_data[selected_pid]["case_manager"] = username
-    #                         save_json(RECORDS_FILE, all_records)
-    #                         save_json(PATIENTS_FILE, patients_data)
-    #                         st.success(f"已核可補發 {record['points_pending']} 點！")
-    #                         st.rerun()
-    #                 else:
-
-    #                     st.success("已核可")
-
-
-
+                            # 更新病人點數
+                            patients_data[selected_pid]["total_points_pending"] -= record['points_pending']
+                            patients_data[selected_pid]["total_points_approved"] += record['points_pending']
+                            patients_data[selected_pid]["case_manager"] = username
+                            save_json(RECORDS_FILE, all_records)
+                            save_json(PATIENTS_FILE, patients_data)
+                            st.success(f"已核可補發 {record['points_pending']} 點！")
+                            st.rerun()
+                    else:
+                        st.success("已核可")
