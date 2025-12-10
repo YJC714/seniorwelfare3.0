@@ -472,6 +472,31 @@ elif st.session_state.page == "帳號審核" and user_role == "admin":
     admin_approval_page()
 elif st.session_state.page == "運動核可":
     st.header("長者運動回報核可")
+    import streamlit as st
+
+   
+    
+    # 單一患者資料
+    patient = {
+        "name": "王小明",
+        "time": "09:00",
+        "exercise": "深蹲 3 組 x 12 下"
+    }
+    
+    # 建立三欄
+    col1, col2, col3 = st.columns(3)
+    cols = [col1, col2, col3]
+    
+    # 三欄顯示同一位患者的資料
+    for i, col in enumerate(cols):
+        with col:
+            st.subheader(patient["name"])
+            st.write(f"🕒 時間：{patient['time']}")
+            st.write(f"💪 運動內容：{patient['exercise']}")
+    
+            if st.button("核可", key=f"approve_{i}"):
+                st.success(f"{patient['name']} 已核可！")
+
 
     # 選擇病人
     patient_options = {pid: f"{info['name']} ({pid})" for pid, info in patients_data.items() 
@@ -522,4 +547,5 @@ elif st.session_state.page == "運動核可":
                             st.success(f"已核可補發 {record['points_pending']} 點！")
                             st.rerun()
                     else:
+
                         st.success("已核可")
