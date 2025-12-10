@@ -474,7 +474,7 @@ elif st.session_state.page == "運動核可":
     st.header("長者運動回報核可")
     
     
-    patient_name = "陳小美"
+    patient_name = "王聖德"
 
     exercise_logs = [
         {"time": "2025-12-10 09:30", "content": "快走 20 分鐘"},
@@ -552,5 +552,6 @@ elif st.session_state.page == "運動核可":
     #                 else:
 
     #                     st.success("已核可")
+
 
 
