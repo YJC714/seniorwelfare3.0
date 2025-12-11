@@ -307,15 +307,15 @@ if st.session_state.page == "運動紀錄":
     st.metric("可用點數", f"{available_points():,} 點", f"總累積 {st.session_state.total_points:,} 點")
 
     df1 = pd.DataFrame({"項目": ["12月運動紀錄核可"],
-                        "審核者:" ["高曼玉個管師"],
+                        "審核者": ["高曼玉個管師"],
                          "時間":[2025-12-30],
                        "點數": ["300點"]},
                        {"項目": ["散步30分鐘"],
-                        "審核者:" ["系統"],
+                        "審核者": ["系統"],
                          "時間":[2025-12-10],
                        "點數": ["20點"]},
                        {"項目": ["社區運動中心"],
-                        "審核者:" ["系統"],
+                        "審核者": ["系統"],
                          "時間":[2025-12-9],
                        "點數": ["27點"]})
     st.dataframe(df1.head(20)[["項目", "審核者","時間","點數"]], use_container_width=True, hide_index=True)
@@ -462,6 +462,7 @@ elif st.session_state.page == "活動推廣":
 #elif st.session_state.page == "報名紀錄":
 
 #    st.header("報名紀錄")
+
 
 
 
