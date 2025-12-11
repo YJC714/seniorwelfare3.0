@@ -38,11 +38,11 @@ prescriptions_all = load_json(PRESCRIPTION_FILE)
 
 # 取得這位長者的完整資料
 user = patients_data.get(CURRENT_PATIENT_ID, {
-    "name": "陳小美",
+    "name": "王聖德",
     "total_points_auto": 0,
     "total_points_pending": 0,
     "total_points_approved": 0,
-    "case_manager": None
+    "case_manager": "高曼玉"
 })
 
 # 設定姓名顯示
@@ -90,7 +90,7 @@ for key in ["records", "redeemed", "total_points", "user_name", "page"]:
     if key not in st.session_state:
         st.session_state[key] = {
             "records": [], "redeemed": [], "total_points": 0,
-            "user_name": "陳小美", "page": "運動紀錄"
+            "user_name": "王聖德", "page": "運動紀錄"
         }[key]
 taiwan_data = {
     '臺北市': ['中正區', '大安區', '信義區', '松山區', '中山區', '中西區', '大同區', '萬華區', '文山區', '南港區', '內湖區', '士林區', '北投區'],
@@ -466,6 +466,7 @@ elif st.session_state.page == "活動推廣":
 #elif st.session_state.page == "報名紀錄":
 
 #    st.header("報名紀錄")
+
 
 
 
