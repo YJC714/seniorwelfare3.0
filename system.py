@@ -373,6 +373,10 @@ if st.session_state.page == "運動紀錄":
    
     st.dataframe(df1.head(20)[["項目", "審核者","時間","點數"]], use_container_width=True, hide_index=True)
 
+    if st.button("⬅️ 回主畫面"):
+        st.session_state.page = "home"
+        st.rerun()
+
 
 # ────────────────────── 點數兌換 ──────────────────────
 elif st.session_state.page == "點數兌換":
@@ -416,6 +420,10 @@ elif st.session_state.page == "點數兌換":
         df = pd.DataFrame(st.session_state.redeemed)
         st.dataframe(df[["日期", "店家", "點數"]], use_container_width=True, hide_index=True)
 
+    if st.button("⬅️ 回主畫面"):
+        st.session_state.page = "home"
+        st.rerun()
+
 
 # ────────────────────── 運動場地（終極必跳版！已百台測試成功）──────────────────────
 
@@ -453,6 +461,9 @@ elif st.session_state.page == "運動場地":
             """, unsafe_allow_html=True)
 
             st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("⬅️ 回主畫面"):
+        st.session_state.page = "home"
+        st.rerun()
 
 # ────────────────────── 活動推廣（同樣用縣市區下拉，自動排序最近）──────────────────────
 elif st.session_state.page == "活動推廣":
@@ -511,10 +522,14 @@ elif st.session_state.page == "活動推廣":
             """, unsafe_allow_html=True)
 
             st.markdown("<br>", unsafe_allow_html=True)
+    if st.button("⬅️ 回主畫面"):
+        st.session_state.page = "home"
+        st.rerun()
 # ────────────────────── 報名紀錄（同樣用縣市區下拉，自動排序最近）──────────────────────
 #elif st.session_state.page == "報名紀錄":
 
 #    st.header("報名紀錄")
+
 
 
 
