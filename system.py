@@ -192,13 +192,22 @@ def available_points():
 # 如果在主畫面，顯示 2x2 按鈕
 if st.session_state.page == "home":
     st.header(f"歡迎回來，王聖德！")
-    st.metric("目前可用點數", f"{available_points():,} 點", delta=f"總累積 {st.session_state.total_points:,} 點")
     st.divider()
 
     # 建立 2x2 按鈕網格
     col_a, col_b = st.columns(2)
     col_c, col_d = st.columns(2)
-
+    button_style = """
+        <style>
+        div.stButton > button {
+            font-size: 24px; /* 放大字體 */
+            height: 120px; /* 放大按鈕高度 */
+            font-weight: bold; /* 字體加粗 */
+            border-radius: 10px; /* 圓角 */
+        }
+        </style>
+    """
+    st.markdown(button_style, unsafe_allow_html=True)
     # 第一行
     with col_a:
         if st.button("🏃 我的運動紀錄", use_container_width=True, type="primary"):
@@ -529,6 +538,7 @@ elif st.session_state.page == "活動推廣":
 #elif st.session_state.page == "報名紀錄":
 
 #    st.header("報名紀錄")
+
 
 
 
