@@ -200,7 +200,7 @@ if st.session_state.page == "home":
     button_style = """
         <style>
         div.stButton > button {
-            font-size: 60px; /* 放大字體 */
+            font-size: 60px !important; /* 放大字體 */
             height: 120px; /* 放大按鈕高度 */
             font-weight: bold; /* 字體加粗 */
             border-radius: 10px; /* 圓角 */
@@ -541,6 +541,7 @@ elif st.session_state.page == "活動推廣":
 #elif st.session_state.page == "報名紀錄":
 
 #    st.header("報名紀錄")
+
 
 
 
