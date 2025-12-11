@@ -221,7 +221,7 @@ if st.session_state.page == "home":
     
     st.divider()
     # 可以在主畫面顯示處方箋摘要
-     with st.container(border=True):
+    with st.container(border=True):
         st.subheader("個案管理師開立的運動處方箋", divider="rainbow")
         col1, col2 = st.columns([1, 4])
         with col1:
@@ -515,6 +515,7 @@ elif st.session_state.page == "活動推廣":
 #elif st.session_state.page == "報名紀錄":
 
 #    st.header("報名紀錄")
+
 
 
 
