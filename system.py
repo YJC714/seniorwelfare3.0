@@ -204,6 +204,9 @@ if st.session_state.page == "home":
             height: 120px; /* 放大按鈕高度 */
             font-weight: bold; /* 字體加粗 */
             border-radius: 10px; /* 圓角 */
+            background-color: #4CAF50; /* 綠色背景 */
+            color: white !important; /* 白色文字 */
+            border: 2px solid #4CAF50;
         }
         </style>
     """
@@ -538,6 +541,7 @@ elif st.session_state.page == "活動推廣":
 #elif st.session_state.page == "報名紀錄":
 
 #    st.header("報名紀錄")
+
 
 
 
