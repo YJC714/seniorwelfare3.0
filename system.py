@@ -378,7 +378,16 @@ elif st.session_state.page == "運動場地":
                 with col1:
                     st.subheader(f"{p['name']}")
                     st.write(f"{p['address']}")
-    
+                with col2:
+                    
+                    url = p.get("url", "https://maps.app.goo.gl/HJ4XztPWry83goV36")
+                    st.markdown(f"""
+            <a href="{url}" target="_blank">
+                <button style="width:100%; height:40px; font-size:16px;">前往地圖</button>
+            </a>
+            """, unsafe_allow_html=True)
+
+            st.markdown("<br>", unsafe_allow_html=True)
 
 # ────────────────────── 活動推廣（同樣用縣市區下拉，自動排序最近）──────────────────────
 elif st.session_state.page == "活動推廣":
@@ -441,6 +450,7 @@ elif st.session_state.page == "活動推廣":
 #elif st.session_state.page == "報名紀錄":
 
 #    st.header("報名紀錄")
+
 
 
 
