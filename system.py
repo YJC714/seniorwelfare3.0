@@ -82,7 +82,8 @@ st.set_page_config(
     #page_title="長輩運動健康平台",
     page_icon="runner",
     layout="wide",
-    initial_sidebar_state="expanded"
+    #initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # ====================== 初始化 ======================
@@ -90,7 +91,7 @@ for key in ["records", "redeemed", "total_points", "user_name", "page"]:
     if key not in st.session_state:
         st.session_state[key] = {
             "records": [], "redeemed": [], "total_points": 0,
-            "user_name": "王聖德", "page": "運動紀錄"
+            "user_name": "王聖德", "page": "home"
         }[key]
 taiwan_data = {
     '臺北市': ['中正區', '大安區', '信義區', '松山區', '中山區', '中西區', '大同區', '萬華區', '文山區', '南港區', '內湖區', '士林區', '北投區'],
@@ -155,39 +156,87 @@ def available_points():
 
 
 
-# ====================== 左側選單：4 個超大按鈕 ======================
-with st.sidebar:
+# # ====================== 左側選單：4 個超大按鈕 ======================
+# with st.sidebar:
     
-    st.title(f"Hi！{st.session_state.user_name}")
-    st.metric("目前可用點數", f"{available_points():,} 點")
-    st.divider()
+#     st.title(f"Hi！{st.session_state.user_name}")
+#     st.metric("目前可用點數", f"{available_points():,} 點")
+#     st.divider()
 
-    # 4 個超大按鈕
-    btn1 = st.button("我的運動紀錄", use_container_width=True, type="primary" if st.session_state.page == "運動紀錄" else "secondary")
-    btn2 = st.button("點數兌換", use_container_width=True, type="primary" if st.session_state.page == "點數兌換" else "secondary")
-    btn3 = st.button("附近運動場地", use_container_width=True, type="primary" if st.session_state.page == "運動場地" else "secondary")
-    btn4 = st.button("活動推廣", use_container_width=True, type="primary" if st.session_state.page == "活動推廣" else "secondary")
-    #btn5 = st.button("報名紀錄", use_container_width=True, type="primary" if st.session_state.page == "報名紀錄" else "secondary")
+#     # 4 個超大按鈕
+#     btn1 = st.button("我的運動紀錄", use_container_width=True, type="primary" if st.session_state.page == "運動紀錄" else "secondary")
+#     btn2 = st.button("點數兌換", use_container_width=True, type="primary" if st.session_state.page == "點數兌換" else "secondary")
+#     btn3 = st.button("附近運動場地", use_container_width=True, type="primary" if st.session_state.page == "運動場地" else "secondary")
+#     btn4 = st.button("活動推廣", use_container_width=True, type="primary" if st.session_state.page == "活動推廣" else "secondary")
+#     #btn5 = st.button("報名紀錄", use_container_width=True, type="primary" if st.session_state.page == "報名紀錄" else "secondary")
 
-    # 點擊後切換頁面
-    if btn1:
-        st.session_state.page = "運動紀錄"
-        st.rerun()
-    if btn2:
-        st.session_state.page = "點數兌換"
-        st.rerun()
-    if btn3:
-        st.session_state.page = "運動場地"
-        st.rerun()
-    if btn4:
-        st.session_state.page = "活動推廣"
-        st.rerun()
-    #if btn5:
-        st.session_state.page = "報名紀錄"
-        st.rerun()
+#     # 點擊後切換頁面
+#     if btn1:
+#         st.session_state.page = "運動紀錄"
+#         st.rerun()
+#     if btn2:
+#         st.session_state.page = "點數兌換"
+#         st.rerun()
+#     if btn3:
+#         st.session_state.page = "運動場地"
+#         st.rerun()
+#     if btn4:
+#         st.session_state.page = "活動推廣"
+#         st.rerun()
+#     #if btn5:
+#         st.session_state.page = "報名紀錄"
+#         st.rerun()
 
 # ====================== 主畫面 ======================
 #st.title("長輩運動健康平台")
+# 如果在主畫面，顯示 2x2 按鈕
+if st.session_state.page == "home":
+    st.header(f"歡迎回來，王聖德！")
+    st.metric("目前可用點數", f"{available_points():,} 點", delta=f"總累積 {st.session_state.total_points:,} 點")
+    st.divider()
+
+    # 建立 2x2 按鈕網格
+    col_a, col_b = st.columns(2)
+    col_c, col_d = st.columns(2)
+
+    # 第一行
+    with col_a:
+        if st.button("🏃 我的運動紀錄", use_container_width=True, type="primary"):
+            st.session_state.page = "運動紀錄"
+            st.rerun()
+    with col_b:
+        if st.button("💰 點數兌換", use_container_width=True, type="primary"):
+            st.session_state.page = "點數兌換"
+            st.rerun()
+
+    # 第二行
+    with col_c:
+        if st.button("📍 附近運動場地", use_container_width=True, type="primary"):
+            st.session_state.page = "運動場地"
+            st.rerun()
+    with col_d:
+        if st.button("🎉 活動推廣", use_container_width=True, type="primary"):
+            st.session_state.page = "活動推廣"
+            st.rerun()
+    
+    st.divider()
+    # 可以在主畫面顯示處方箋摘要
+     with st.container(border=True):
+        st.subheader("個案管理師開立的運動處方箋", divider="rainbow")
+        col1, col2 = st.columns([1, 4])
+        with col1:
+            if prescription.get("status") == "進行中":
+                st.success("進行中")
+            elif prescription.get("status") == "已完成":
+                st.info("已完成")
+            else:
+              #  st.warning("尚未開立")
+                st.success("進行中")
+        with col2:
+            st.write(f"開立日期：{prescription['開立日期']}　｜　個管師：{prescription['個管師']}")
+        
+        for item in prescription["處方內容"]:
+            st.markdown(f"• {item}")
 
 # ────────────────────── 運動紀錄 ──────────────────────
 if st.session_state.page == "運動紀錄":
@@ -466,6 +515,7 @@ elif st.session_state.page == "活動推廣":
 #elif st.session_state.page == "報名紀錄":
 
 #    st.header("報名紀錄")
+
 
 
 
