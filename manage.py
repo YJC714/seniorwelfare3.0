@@ -81,7 +81,7 @@ elif st.session_state.page == "處方箋管理":
     
     patient_history = df_pres[df_pres['patient_num'].astype(str) == target_pid].sort_values(by="prescription_date", ascending=False)
         # 根據 patients 表的 frailty_level 自動設定下拉選單預設值
-    frailty_value = p_info.get('frailty_level')  # ← 如果你的欄位不是這個名字，請改成正確的！
+    frailty_value = p_info.get('frailty')  # ← 如果你的欄位不是這個名字，請改成正確的！
 
     if pd.isna(frailty_value) or frailty_value == '':
         default_frailty_label = "第3級還可以"   # 沒填的時候預設第3級
@@ -227,6 +227,7 @@ elif st.session_state.page == "運動回報核可":
                     else:
                         # 狀態 C：不符合處方
                         st.error("額外運動")
+
 
 
 
