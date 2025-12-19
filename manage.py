@@ -119,7 +119,7 @@ elif st.session_state.page == "處方箋管理":
             new_data = {
                 "case_manager": CASE_MANAGER_NAME,
                 "patient_num": target_pid,
-                "prescription_date": datetime.date.today().strftime("%Y-%m-%d"),
+                "prescription_date": datetime.date.today().strftime("%Y-%m-%d %H:%M:%S"),
                 "case_manager_name": "李佳芬",
                 "content": "、".join(final_items),
                 "minute": int(duration),
@@ -127,7 +127,7 @@ elif st.session_state.page == "處方箋管理":
                 "other": notes,
                 "status": status,
                 "frailty": f_data["value"],
-                "last_update": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+                "last_update": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
             # ===== 關鍵：真的寫進 Google Sheets =====
             # 1. 把新資料加到 df_pres 末端
@@ -147,7 +147,7 @@ elif st.session_state.page == "處方箋管理":
         st.write("目前尚無歷史紀錄。")
     else:
         for idx, h_row in patient_history.iterrows():
-            with st.expander(f"{h_row['prescription_date']} | 狀態：{h_row['status']}"):
+            with st.expander(f"{h_row['prescription_date']} |{h_row.get('last_update', '')}| 狀態：{h_row['status']}"):
                 if ( h_row['frequency']=='0' and h_row['minute']=='0'):
                     st.write(f"運動處方箋： {h_row['content']}")
                     st.caption(f"備註：{h_row.get('other', '無')}")
@@ -237,6 +237,7 @@ elif st.session_state.page == "運動回報核可":
                     else:
                         # 狀態 C：不符合處方
                         st.error("額外運動")
+
 
 
 
