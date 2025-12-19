@@ -4,16 +4,16 @@ import datetime
 from streamlit_gsheets import GSheetsConnection
 
 # ====================== 1. 頁面設定 ======================
-st.set_page_config(page_title="個管師後台 - Jiafen", layout="wide")
+st.set_page_config(page_title="個管師後台 - 李佳芬個管師", layout="wide")
 CASE_MANAGER_NAME = "李佳芬個管師"
 
 # 定義 CFS 與運動建議的對應關係
 FRAILTY_LOGIC = {
-    "第1級非常健康": {"value": 1.0, "suggested": ["慢跑", "重量訓練", "快走", "游泳"]},
+    "第1級非常健康": {"value": 1.0, "suggested": ["步行", "重量訓練", "快走", "舉寶特瓶"]},
     "第2級很好": {"value": 2.0, "suggested": ["步行", "慢跑", "社交舞", "太極拳"]},
     "第3級還可以": {"value": 3.0, "suggested": ["步行", "起立坐下訓練", "平衡練習", "伸展運動"]},
-    "第4級脆弱": {"value": 4.0, "suggested": ["步行", "椅子深蹲", "抬腳練習", "伸展運動"]},
-    "第5級輕度衰弱": {"value": 5.0, "suggested": ["椅子操", "床邊抬腳", "擴胸運動", "手部握力練習"]}
+    "第4級脆弱": {"value": 4.0, "suggested": ["步行", "手臂向上拉伸", "抬腳練習", "伸展運動"]},
+    "第5級輕度衰弱": {"value": 5.0, "suggested": ["抬腳練習", "舉寶特瓶", "擴胸運動", "手部握力練習"]}
 }
 
 # ====================== 2. GSheet 連線 ======================
@@ -63,7 +63,7 @@ if st.session_state.page == "病人列表":
                 if not patient_pres.empty:
                     latest = patient_pres.iloc[-1]
                     f_val = latest.get('frailty', '-')
-                    st.success(f"處方狀態：{latest['status']} (CFS: {f_val})")
+                    st.success(f"處方狀態：{latest['status']} 
                 else:
                     st.warning("狀態：尚未開立處方箋")
             with c3:
@@ -213,3 +213,4 @@ elif st.session_state.page == "運動回報核可":
                     else:
                         # 狀態 C：不符合處方
                         st.error("額外運動")
+
