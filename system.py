@@ -19,25 +19,45 @@ import pandas as pd
 
 st.markdown("""
     <style>
-    /* 1. 強制修改按鈕內所有層級的文字大小 */
-    button[data-testid="stBaseButton-primary"], 
-    button[data-testid="stBaseButton-secondary"],
-    .stButton button p {
-        font-size: 35px !important; /* 直接拉大到 35px */
-        font-weight: bold !important;
-        line-height: 1.5 !important;
-    }
-
-    /* 2. 針對地圖連結按鈕 (Link Button) 的文字 */
-    .stLinkButton a span, .stLinkButton a p {
+    /* 1. 強制放大所有按鈕內的文字 (包含普通按鈕與連結按鈕) */
+    div[data-testid="stButton"] button p, 
+    div[data-testid="stLinkButton"] a p,
+    div[data-testid="stBaseButton-primary"] p,
+    div[data-testid="stBaseButton-secondary"] p {
         font-size: 35px !important;
         font-weight: bold !important;
     }
 
-    /* 3. 同時增加按鈕高度，確保大字放得下 */
-    div.stButton > button, div.stLinkButton > a {
-        min-height: 90px !important;
-        padding: 10px !important;
+    /* 2. 針對按鈕本身的高度調整，避免字體太大被切掉 */
+    div[data-testid="stButton"] button, 
+    div[data-testid="stLinkButton"] a {
+        min-height: 100px !important;
+        border-radius: 20px !important;
+    }
+
+    /* 3. 放大 Metric (點數看板) 的數字與標籤 */
+    div[data-testid="stMetricValue"] {
+        font-size: 50px !important;
+        color: #FF4B4B !important; /* 讓數字變紅色更明顯 */
+    }
+    div[data-testid="stMetricLabel"] p {
+        font-size: 28px !important;
+        font-weight: bold !important;
+    }
+
+    /* 4. 放大一般 Markdown 文字與說明 */
+    .stMarkdown p, .stMarkdown li {
+        font-size: 24px !important;
+        line-height: 1.6 !important;
+    }
+    
+    /* 5. 放大下拉選單 (Selectbox) 的文字 */
+    div[data-testid="stSelectbox"] label p {
+        font-size: 26px !important;
+        font-weight: bold !important;
+    }
+    div[data-baseweb="select"] > div {
+        font-size: 24px !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -680,3 +700,4 @@ elif st.session_state.view == "活動推廣":
                 
                 with col2:
                     st.write("")
+
