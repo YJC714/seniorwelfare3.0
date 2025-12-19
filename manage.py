@@ -131,7 +131,7 @@ elif st.session_state.page == "處方箋管理":
             }
             # ===== 關鍵：真的寫進 Google Sheets =====
             # 1. 把新資料加到 df_pres 末端
-            df_pres = pd.concat([df_pres, pd.DataFrame([new_row])], ignore_index=True)
+            df_pres = pd.concat([df_pres, pd.DataFrame([new_data])], ignore_index=True)
             
             # 2. 寫回 prescriptions 工作表
             conn.update(worksheet="prescriptions", data=df_pres)
@@ -237,6 +237,7 @@ elif st.session_state.page == "運動回報核可":
                     else:
                         # 狀態 C：不符合處方
                         st.error("額外運動")
+
 
 
 
