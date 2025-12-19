@@ -127,10 +127,14 @@ elif st.session_state.page == "處方箋管理":
         st.write("目前尚無歷史紀錄。")
     else:
         for idx, h_row in patient_history.iterrows():
-            with st.expander(f"{h_row['prescription_date']} | CFS: {h_row.get('frailty','-')} | 狀態：{h_row['status']}"):
-                st.write(f"建議運動： {h_row['content']}")
-                st.write(f"計畫： 每週 {h_row['frequency']} 次，每次 {h_row['minute']} 分鐘")
-                st.caption(f"備註：{h_row.get('other', '無')}")
+            with st.expander(f"{h_row['prescription_date']} | 狀態：{h_row['status']}"):
+                if ( h_row['frequency']==0 && h_row['minute']==0)
+                    st.write(f"運動處方箋： {h_row['content']}")
+                    st.caption(f"備註：{h_row.get('other', '無')}")
+                else 
+                    st.write(f"運動處方箋： {h_row['content']}")
+                    st.write(f"計畫： 每週 {h_row['frequency']} 次，每次 {h_row['minute']} 分鐘")
+                    st.caption(f"備註：{h_row.get('other', '無')}")
 
 # ====================== 6. 運動回報核可 ======================
 elif st.session_state.page == "運動回報核可":
@@ -213,6 +217,7 @@ elif st.session_state.page == "運動回報核可":
                     else:
                         # 狀態 C：不符合處方
                         st.error("額外運動")
+
 
 
 
