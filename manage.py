@@ -63,7 +63,7 @@ if st.session_state.page == "病人列表":
                 if not patient_pres.empty:
                     latest = patient_pres.iloc[-1]
                     f_val = latest.get('frailty', '-')
-                    st.success(f"處方狀態：{latest['status']} )
+                    st.success(f"處方狀態：{latest['status']}"})
                 else:
                     st.warning("狀態：尚未開立處方箋")
             with c3:
@@ -213,5 +213,6 @@ elif st.session_state.page == "運動回報核可":
                     else:
                         # 狀態 C：不符合處方
                         st.error("額外運動")
+
 
 
