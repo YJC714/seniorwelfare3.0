@@ -10,3 +10,4 @@ pandas
 plotly
 streamlit-javascript
 pydeck
+streamlit-gsheets
