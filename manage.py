@@ -7,7 +7,7 @@ from streamlit_gsheets import GSheetsConnection
 st.set_page_config(page_title="個管師後台 - 高曼玉", layout="wide")
 
 # 設定個管師標籤
-CASE_MANAGER_NAME = "Jiafen"
+CASE_MANAGER_NAME = "李佳芬個管師"
 
 # ====================== 2. GSheet 連線 ======================
 conn = st.connection("gsheets", type=GSheetsConnection)
@@ -127,4 +127,5 @@ elif st.session_state.page == "運動回報核可":
                     if st.button("核可發放", key=f"appv_{idx}"):
                         st.balloons()
                         st.success("點數已核發！")
+
 
