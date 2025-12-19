@@ -4,129 +4,212 @@ import datetime
 from streamlit_gsheets import GSheetsConnection
 
 # ====================== 1. 頁面設定 ======================
-st.set_page_config(page_title="個管師後台 - 李佳芬", layout="wide")
-
-# 設定個管師標籤
+st.set_page_config(page_title="個管師後台 - Jiafen", layout="wide")
 CASE_MANAGER_NAME = "李佳芬個管師"
+
+# 定義 CFS 與運動建議的對應關係
+FRAILTY_LOGIC = {
+    "第1級非常健康": {"value": 1.0, "suggested": ["慢跑", "重量訓練", "快走", "游泳"]},
+    "第2級很好": {"value": 2.0, "suggested": ["步行", "慢跑", "社交舞", "太極拳"]},
+    "第3級還可以": {"value": 3.0, "suggested": ["步行", "起立坐下訓練", "平衡練習", "伸展運動"]},
+    "第4級脆弱": {"value": 4.0, "suggested": ["步行", "椅子深蹲", "抬腳練習", "伸展運動"]},
+    "第5級輕度衰弱": {"value": 5.0, "suggested": ["椅子操", "床邊抬腳", "擴胸運動", "手部握力練習"]}
+}
 
 # ====================== 2. GSheet 連線 ======================
 conn = st.connection("gsheets", type=GSheetsConnection)
 
 def load_data():
-    # 讀取病患、處方與運動紀錄
-    df_patients = conn.read(worksheet="patients", ttl=5)
-    df_prescriptions = conn.read(worksheet="prescriptions", ttl=5)
-    df_exercise = conn.read(worksheet="exercise_report", ttl=5)
+    df_patients = conn.read(worksheet="patients", ttl=2)
+    df_prescriptions = conn.read(worksheet="prescriptions", ttl=2)
+    df_exercise = conn.read(worksheet="exercise_report", ttl=2)
     return df_patients, df_prescriptions, df_exercise
 
 df_p, df_pres, df_ex = load_data()
 
-# ====================== 3. 左側選單 ======================
+# ====================== 3. 頁面切換邏輯 ======================
 if "page" not in st.session_state:
     st.session_state.page = "病人列表"
 
 with st.sidebar:
     st.title("個管師後台")
-    st.write(f"當前個管師：**{CASE_MANAGER_NAME}**")
+    st.write(f"歡迎，**{CASE_MANAGER_NAME}**")
     st.divider()
-    if st.button("病人列表", use_container_width=True): st.session_state.page = "病人列表"; st.rerun()
-    if st.button("開立處方箋", use_container_width=True): st.session_state.page = "處方箋管理"; st.rerun()
-    if st.button("運動回報核可", use_container_width=True): st.session_state.page = "運動回報核可"; st.rerun()
+    if st.button("病人列表", use_container_width=True): 
+        st.session_state.page = "病人列表"
+        st.rerun()
+    if st.button("開立處方箋", use_container_width=True): 
+        st.session_state.page = "處方箋管理"
+        st.rerun()
+    if st.button("運動回報核可", use_container_width=True): 
+        st.session_state.page = "運動回報核可"
+        st.rerun()
 
-# ====================== 4. 功能頁面：病人列表 ======================
+# ====================== 4. 病人列表 ======================
 if st.session_state.page == "病人列表":
     st.header("病人列表")
-    
-    # 篩選屬於 Jiafen 的病人
     my_patients = df_p[df_p['case_manager'] == CASE_MANAGER_NAME]
     
     for _, row in my_patients.iterrows():
+        pid = str(row['patient_num'])
+        patient_pres = df_pres[df_pres['patient_num'].astype(str) == pid]
+        
         with st.container(border=True):
             c1, c2, c3 = st.columns([2, 2, 1])
-            pid = str(row['patient_num'])
             with c1:
                 st.subheader(f"{row['name']}")
-                st.write(f"病歷號：{pid} | 年齡：{int(row['age'])}歲")
+                st.write(f"病歷號：{pid} | 年齡：{int(row['age'])} 歲")
             with c2:
-                # 顯示最新衰弱等級
-                level = row.get('frailty_level', '尚未評估')
-                st.info(f"臨床衰弱量表：{level}")
+                if not patient_pres.empty:
+                    latest = patient_pres.iloc[-1]
+                    f_val = latest.get('frailty', '-')
+                    st.success(f"處方狀態：{latest['status']} (CFS: {f_val})")
+                else:
+                    st.warning("狀態：尚未開立處方箋")
             with c3:
-                if st.button("編輯處方", key=f"edit_{pid}", use_container_width=True):
+                if st.button("詳情 / 編輯", key=f"edit_{pid}", use_container_width=True):
                     st.session_state.selected_pid = pid
                     st.session_state.page = "處方箋管理"
                     st.rerun()
 
-# ====================== 5. 功能頁面：處方箋管理 ======================
+# ====================== 5. 處方箋管理 ======================
 elif st.session_state.page == "處方箋管理":
-    st.header("📝 運動處方箋開立")
-    
-    # 選取病人
     target_pid = st.session_state.get("selected_pid", "1.0")
-    patient_info = df_p[df_p['patient_num'].astype(str) == target_pid].iloc[0]
-    
-    st.info(f"正在為 **{patient_info['name']}** (ID: {target_pid}) 設定處方")
+    p_info = df_p[df_p['patient_num'].astype(str) == target_pid].iloc[0]
+
+    st.header(f"運動處方箋管理：{p_info['name']}")
+
+    patient_history = df_pres[df_pres['patient_num'].astype(str) == target_pid].sort_values(by="prescription_date", ascending=False)
 
     with st.form("prescription_form"):
+        st.subheader("新增處方箋")
         col1, col2 = st.columns(2)
+        
         with col1:
-            # 臨床衰弱量表
-            frailty = st.selectbox("臨床衰弱量表 (Frailty Scale)", 
-                ["第1級非常健康", "第2級很好", "第3級還可以", "第4級脆弱", "第5級輕度衰弱", "第6級中度衰弱"])
+            selected_f_label = st.selectbox("臨床衰弱量表 (CFS) 評估", options=list(FRAILTY_LOGIC.keys()))
+            f_data = FRAILTY_LOGIC[selected_f_label]
+            st.info(f"針對{selected_f_label}，建議運動：{', '.join(f_data['suggested'])}")
             
-            # 運動項目多選 + 自定義
-            base_exercises = ["步行", "伸展運動", "深蹲", "外展運動", "太極拳"]
-            selected_ex = st.multiselect("建議運動項目", base_exercises, default=["步行"])
-            other_ex = st.text_input("其他運動項目 (請用逗號分隔)")
+            selected_ex = st.multiselect("選擇運動項目", 
+                                        options=f_data['suggested'] + ["其他"], 
+                                        default=[f_data['suggested'][0]])
+            other_ex = st.text_input("輸入其他運動項目 (若有選擇'其他')")
             
         with col2:
-            freq = st.number_input("每週頻率 (1~7次)", min_value=1, max_value=7, value=3)
+            freq = st.number_input("每週頻率 (次)", min_value=1, max_value=7, value=3)
             duration = st.number_input("每次時長 (分鐘)", min_value=5, max_value=120, value=30, step=5)
-            notes = st.text_area("備註", placeholder="其他身體狀況")
+            status = st.selectbox("處方狀態", ["進行中", "已完成", "調整中"])
+            notes = st.text_area("備註 (長輩特殊狀況)", height=100)
 
-        if st.form_submit_button("儲存並發布處方箋", use_container_width=True):
-            # 整合運動內容
-            final_content = selected_ex + [i.strip() for i in other_ex.split(",") if i.strip()]
+        if st.form_submit_button("儲存並發布新處方箋", use_container_width=True):
+            final_items = [i for i in selected_ex if i != "其他"]
+            if "其他" in selected_ex and other_ex:
+                final_items.append(other_ex.strip())
             
-            # 這裡應該要寫入 GSheet (由於 conn.update 是某些版本功能，建議手動更新)
-            st.success(f"處方已更新！項目：{', '.join(final_content)}")
-            st.warning("提醒：請確認 GSheet 的 prescriptions 工作表已同步更新。")
-            # 註：實際開發時會使用 conn.update(data=...) 或直接調用 gspread 寫入
+            new_data = {
+                "case_manager": CASE_MANAGER_NAME,
+                "patient_num": target_pid,
+                "prescription_date": datetime.date.today().strftime("%Y-%m-%d"),
+                "case_manager_name": "李佳芬",
+                "content": "、".join(final_items),
+                "minute": int(duration),
+                "frequency": int(freq),
+                "other": notes,
+                "status": status,
+                "frailty": f_data["value"],
+                "last_update": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+            }
+            st.success(f"已儲存！衰弱等級：{f_data['value']} | 項目：{new_data['content']}")
 
-# ====================== 6. 功能頁面：運動回報核可 ======================
+    st.divider()
+    st.subheader("歷史處方紀錄")
+    if patient_history.empty:
+        st.write("目前尚無歷史紀錄。")
+    else:
+        for idx, h_row in patient_history.iterrows():
+            with st.expander(f"{h_row['prescription_date']} | CFS: {h_row.get('frailty','-')} | 狀態：{h_row['status']}"):
+                st.write(f"建議運動： {h_row['content']}")
+                st.write(f"計畫： 每週 {h_row['frequency']} 次，每次 {h_row['minute']} 分鐘")
+                st.caption(f"備註：{h_row.get('other', '無')}")
+
+# ====================== 6. 運動回報核可 ======================
 elif st.session_state.page == "運動回報核可":
     st.header("運動回報核可")
-    
-    # 篩選出目前該個管師旗下病人的所有運動紀錄
-    my_pids = df_p[df_p['case_manager'] == CASE_MANAGER_NAME]['patient_num'].astype(str).tolist()
-    pending_logs = df_ex[df_ex['patient_num'].astype(str).isin(my_pids)]
 
-    if pending_logs.empty:
-        st.write("目前沒有待處理的回報紀錄。")
+    # 1. 篩選 Jiafen 旗下的長者
+    my_patients_df = df_p[df_p['case_manager'] == CASE_MANAGER_NAME]
+    patient_options = {row['name']: str(row['patient_num']) for _, row in my_patients_df.iterrows()}
+    selected_p_name = st.selectbox("選擇長者", options=["全部"] + list(patient_options.keys()))
+
+    # 2. 獲取 12 月的所有紀錄 (移除原本的 approved != 'TRUE' 過濾)
+    df_ex['date'] = pd.to_datetime(df_ex['date'])
+    december_logs = df_ex[(df_ex['date'].dt.month == 12) & (df_ex['date'].dt.year == 2025)]
+
+    if selected_p_name != "全部":
+        target_pid = patient_options[selected_p_name]
+        final_logs = december_logs[december_logs['patient_num'].astype(str) == target_pid]
     else:
-        for idx, log in pending_logs.iterrows():
-            # 找到對應病人名稱
-            p_name = df_p[df_p['patient_num'].astype(str) == str(log['patient_num'])]['name'].values[0]
-            
-            # 計算公式：長者端看到的 pending 應該是 auto/4*6
-            auto_pts = int(log['minute'])
-            bonus_pts = int(auto_pts / 4 * 6)
+        target_pids = list(patient_options.values())
+        final_logs = december_logs[december_logs['patient_num'].astype(str).isin(target_pids)]
 
+    if final_logs.empty:
+        st.info("目前沒有 12 月的運動回報紀錄。")
+    else:
+        # 按日期排序，最新的在前
+        final_logs = final_logs.sort_values(by='date', ascending=False)
+        
+        for idx, log in final_logs.iterrows():
+            pid = str(log['patient_num'])
+            current_p_name = df_p[df_p['patient_num'].astype(str) == pid]['name'].values[0]
+            
+            # 判斷當前這筆紀錄在資料庫中是否已核可
+            is_already_approved = str(log['approved']).upper() == 'TRUE'
+            
+            # --- 比對處方箋邏輯 ---
+            latest_pres = df_pres[(df_pres['patient_num'].astype(str) == pid) & 
+                                 (df_pres['status'] == "進行中")].sort_values(by="prescription_date").iloc[-1:]
+            
+            is_valid_exercise = False
+            if not latest_pres.empty:
+                pres_content = latest_pres['content'].values[0]
+                if log['exercise_name'] in pres_content:
+                    is_valid_exercise = True
+
+            # --- 顯示介面 ---
             with st.container(border=True):
                 c1, c2, c3, c4 = st.columns([1.5, 2, 2, 1])
                 with c1:
-                    st.write(f"**{p_name}**")
-                    st.caption(f"ID: {log['patient_num']}")
+                    st.write(f"姓名：{current_p_name}")
+                    st.caption(f"ID: {pid}")
                 with c2:
-                    st.write(f"{log['date']}")
-                    st.write(f"{log['exercise_name']}")
+                    st.write(f"日期：{log['date'].strftime('%Y-%m-%d')}")
+                    st.write(f"回報項目：{log['exercise_name']}")
                 with c3:
-                    st.write(f"時間：{auto_pts} 分鐘")
-                    st.write(f"可核發：**{bonus_pts} 點**")
+                    duration = int(log['minute'])
+                    bonus_pts = int(duration / 4 * 6)
+                    st.write(f"運動時長：{duration} 分鐘")
+                    st.write(f"預計獎勵：{bonus_pts} 點")
+                
                 with c4:
-                    if st.button("核可發放", key=f"appv_{idx}"):
-                        st.balloons()
-                        st.success("點數已核發！")
-
-
-
+                    if is_already_approved:
+                        # 狀態 A：已經核可過的項目，永久顯示綠色成功狀態
+                        st.success("已核可")
+                    elif is_valid_exercise:
+                        # 狀態 B：符合處方但尚未核可
+                        if st.button("核可", key=f"btn_{idx}", use_container_width=True):
+                            # A. 更新運動紀錄表 (將該行 approved 設為 True)
+                            df_ex.at[idx, 'approved'] = True
+                            conn.update(worksheet="exercise_report", data=df_ex)
+                            
+                            # B. 更新病人點數表
+                            p_idx = df_p[df_p['patient_num'].astype(str) == pid].index[0]
+                            current_pending = df_p.at[p_idx, 'total_points_pending']
+                            new_pending = (0 if pd.isna(current_pending) else current_pending) + bonus_pts
+                            df_p.at[p_idx, 'total_points_pending'] = new_pending
+                            
+                            conn.update(worksheet="patients", data=df_p)
+                            
+                            st.rerun() # 重新整理後，這筆紀錄會因為 is_already_approved 變成 True 而顯示成功標籤
+                    else:
+                        # 狀態 C：不符合處方
+                        st.error("額外運動")
