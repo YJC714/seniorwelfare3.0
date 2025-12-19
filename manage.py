@@ -76,17 +76,28 @@ if st.session_state.page == "病人列表":
 elif st.session_state.page == "處方箋管理":
     target_pid = st.session_state.get("selected_pid", "1.0")
     p_info = df_p[df_p['patient_num'].astype(str) == target_pid].iloc[0]
-
+    
     st.header(f"運動處方箋管理：{p_info['name']}")
-
+    
     patient_history = df_pres[df_pres['patient_num'].astype(str) == target_pid].sort_values(by="prescription_date", ascending=False)
-
+    # ===== 關鍵：找出「目前進行中」的最新處方，用來預設衰弱等級 =====
+    active_pres = patient_history[patient_history['status'] == "進行中"]
+    if not active_pres.empty:
+        latest_active = active_pres.iloc[0]
+        current_frailty_value = latest_active['frailty']  # 這是數字，例如 3.0
+        # 反向查找對應的文字標籤
+        default_frailty_label = next(
+            label for label, data in FRAILTY_LOGIC.items() if data["value"] == current_frailty_value
+        )
+    else:
+        # 沒有進行中的處方時，預設為「第3級還可以」
+        default_frailty_label = "第3級還可以"
     with st.form("prescription_form"):
         st.subheader("新增處方箋")
         col1, col2 = st.columns(2)
         
         with col1:
-            selected_f_label = st.selectbox("臨床衰弱量表 (CFS) 評估", options=list(FRAILTY_LOGIC.keys()))
+            selected_f_label = st.selectbox("臨床衰弱量表 (CFS) 評估", options=list(FRAILTY_LOGIC.keys()),index=list(FRAILTY_LOGIC.keys()).index(default_frailty_label)
             f_data = FRAILTY_LOGIC[selected_f_label]
             st.info(f"針對{selected_f_label}，建議運動：{', '.join(f_data['suggested'])}")
             
@@ -217,6 +228,7 @@ elif st.session_state.page == "運動回報核可":
                     else:
                         # 狀態 C：不符合處方
                         st.error("額外運動")
+
 
 
 
