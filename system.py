@@ -329,14 +329,30 @@ if st.session_state.view == "home":
     # 處方箋顯示（簡潔版）
     with st.container(border=True):
         st.subheader("個案管理師開立的運動處方箋", divider="rainbow")
+        
         p_date = prescription.get('prescription_date', '尚未開立')
         p_manager = prescription.get('case_manager_name', prescription.get('case_manager', '未指派'))
         p_freq = prescription.get("frequency", 0)
         p_min = prescription.get("minute", 0)
         content_str = "、".join(prescription.get("content", ["請聯繫個管師開立處方"]))
-
+        
         st.write(f"📅 開立日期：{p_date}　｜　👤 個管師：{p_manager}")
-        st.info(f"🚀 運動目標：每週進行 {content_str}，共 {p_freq} 次，每次 {p_min} 分鐘")
+        
+        # 動態產生運動目標文字
+        if p_freq == 0 and p_min == 0:
+            info_text = f"🚀 運動目標：進行 {content_str}"
+        else:
+            # 進一步優化：如果只有次數或只有分鐘，也分別處理（可選）
+            parts = []
+            if p_freq > 0:
+                parts.append(f"共 {p_freq} 次")
+            if p_min > 0:
+                parts.append(f"每次 {p_min} 分鐘")
+            
+            frequency_part = "，".join(parts) if parts else ""
+            info_text = f"🚀 運動目標：每週進行 {content_str}，{frequency_part}".strip("，")
+        
+        st.info(info_text)
 
     st.markdown("### 請選擇功能")
     
@@ -700,4 +716,3 @@ elif st.session_state.view == "活動推廣":
                 
                 with col2:
                     st.write("")
-
