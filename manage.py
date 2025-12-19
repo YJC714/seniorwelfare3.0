@@ -128,7 +128,7 @@ elif st.session_state.page == "處方箋管理":
     else:
         for idx, h_row in patient_history.iterrows():
             with st.expander(f"{h_row['prescription_date']} | 狀態：{h_row['status']}"):
-                if ( h_row['frequency']=='0' and h_row['minute']=='0')
+                if ( h_row['frequency']=='0' and h_row['minute']=='0'):
                     st.write(f"運動處方箋： {h_row['content']}")
                     st.caption(f"備註：{h_row.get('other', '無')}")
                 else 
@@ -217,6 +217,7 @@ elif st.session_state.page == "運動回報核可":
                     else:
                         # 狀態 C：不符合處方
                         st.error("額外運動")
+
 
 
 
