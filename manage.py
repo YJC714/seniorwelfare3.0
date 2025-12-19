@@ -80,18 +80,17 @@ elif st.session_state.page == "處方箋管理":
     st.header(f"運動處方箋管理：{p_info['name']}")
     
     patient_history = df_pres[df_pres['patient_num'].astype(str) == target_pid].sort_values(by="prescription_date", ascending=False)
-    # ===== 關鍵：找出「目前進行中」的最新處方，用來預設衰弱等級 =====
-    active_pres = patient_history[patient_history['status'] == "進行中"]
-    if not active_pres.empty:
-        latest_active = active_pres.iloc[0]
-        current_frailty_value = latest_active['frailty']  # 這是數字，例如 3.0
-        # 反向查找對應的文字標籤
-        default_frailty_label = next(
-            label for label, data in FRAILTY_LOGIC.items() if data["value"] == current_frailty_value
-        )
+        # 根據 patients 表的 frailty_level 自動設定下拉選單預設值
+    frailty_value = p_info.get('frailty_level')  # ← 如果你的欄位不是這個名字，請改成正確的！
+
+    if pd.isna(frailty_value) or frailty_value == '':
+        default_frailty_label = "第3級還可以"   # 沒填的時候預設第3級
     else:
-        # 沒有進行中的處方時，預設為「第3級還可以」
-        default_frailty_label = "第3級還可以"
+        try:
+            val = float(frailty_value)
+            default_frailty_label = next(label for label, info in FRAILTY_LOGIC.items() if info["value"] == val)
+        except:
+            default_frailty_label = "第3級還可以"   # 如果數字怪怪的，也用第3級
     with st.form("prescription_form"):
         st.subheader("新增處方箋")
         col1, col2 = st.columns(2)
@@ -228,6 +227,7 @@ elif st.session_state.page == "運動回報核可":
                     else:
                         # 狀態 C：不符合處方
                         st.error("額外運動")
+
 
 
 
