@@ -129,8 +129,18 @@ elif st.session_state.page == "處方箋管理":
                 "frailty": f_data["value"],
                 "last_update": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
             }
-            st.success(f"已儲存！衰弱等級：{f_data['value']} | 項目：{new_data['content']}")
-
+            # ===== 關鍵：真的寫進 Google Sheets =====
+            # 1. 把新資料加到 df_pres 末端
+            df_pres = pd.concat([df_pres, pd.DataFrame([new_row])], ignore_index=True)
+            
+            # 2. 寫回 prescriptions 工作表
+            conn.update(worksheet="prescriptions", data=df_pres)
+            
+            # 3. 顯示成功訊息並重新整理頁面（看到新處方出現在歷史紀錄）
+            st.success(f"✅ 新處方已成功開立並儲存！")
+            
+            st.rerun()  # 重新執行，讓歷史紀錄立刻更新顯示新開的處方
+            
     st.divider()
     st.subheader("歷史處方紀錄")
     if patient_history.empty:
@@ -227,6 +237,7 @@ elif st.session_state.page == "運動回報核可":
                     else:
                         # 狀態 C：不符合處方
                         st.error("額外運動")
+
 
 
 
