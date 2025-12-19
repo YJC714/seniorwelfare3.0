@@ -26,16 +26,16 @@ if "page" not in st.session_state:
     st.session_state.page = "病人列表"
 
 with st.sidebar:
-    st.title("🏥 個管師後台")
+    st.title("個管師後台")
     st.write(f"當前個管師：**{CASE_MANAGER_NAME}**")
     st.divider()
-    if st.button("👥 病人列表", use_container_width=True): st.session_state.page = "病人列表"; st.rerun()
-    if st.button("📝 開立處方箋", use_container_width=True): st.session_state.page = "處方箋管理"; st.rerun()
-    if st.button("✅ 運動回報核可", use_container_width=True): st.session_state.page = "運動回報核可"; st.rerun()
+    if st.button("病人列表", use_container_width=True): st.session_state.page = "病人列表"; st.rerun()
+    if st.button("開立處方箋", use_container_width=True): st.session_state.page = "處方箋管理"; st.rerun()
+    if st.button("運動回報核可", use_container_width=True): st.session_state.page = "運動回報核可"; st.rerun()
 
 # ====================== 4. 功能頁面：病人列表 ======================
 if st.session_state.page == "病人列表":
-    st.header("👥 我的病人列表")
+    st.header("病人列表")
     
     # 篩選屬於 Jiafen 的病人
     my_patients = df_p[df_p['case_manager'] == CASE_MANAGER_NAME]
@@ -82,9 +82,9 @@ elif st.session_state.page == "處方箋管理":
         with col2:
             freq = st.number_input("每週頻率 (1~7次)", min_value=1, max_value=7, value=3)
             duration = st.number_input("每次時長 (分鐘)", min_value=5, max_value=120, value=30, step=5)
-            notes = st.text_area("給長者的貼心備註", placeholder="加油！每天進步一點點")
+            notes = st.text_area("備註", placeholder="其他身體狀況")
 
-        if st.form_submit_button("✅ 儲存並發布處方箋", use_container_width=True):
+        if st.form_submit_button("儲存並發布處方箋", use_container_width=True):
             # 整合運動內容
             final_content = selected_ex + [i.strip() for i in other_ex.split(",") if i.strip()]
             
@@ -95,7 +95,7 @@ elif st.session_state.page == "處方箋管理":
 
 # ====================== 6. 功能頁面：運動回報核可 ======================
 elif st.session_state.page == "運動回報核可":
-    st.header("✅ 運動回報核可")
+    st.header("運動回報核可")
     
     # 篩選出目前該個管師旗下病人的所有運動紀錄
     my_pids = df_p[df_p['case_manager'] == CASE_MANAGER_NAME]['patient_num'].astype(str).tolist()
@@ -115,15 +115,16 @@ elif st.session_state.page == "運動回報核可":
             with st.container(border=True):
                 c1, c2, c3, c4 = st.columns([1.5, 2, 2, 1])
                 with c1:
-                    st.write(f"👤 **{p_name}**")
+                    st.write(f"**{p_name}**")
                     st.caption(f"ID: {log['patient_num']}")
                 with c2:
-                    st.write(f"📅 {log['date']}")
-                    st.write(f"🏃 {log['exercise_name']}")
+                    st.write(f"{log['date']}")
+                    st.write(f"{log['exercise_name']}")
                 with c3:
-                    st.write(f"⏱️ 時間：{auto_pts} 分鐘")
-                    st.write(f"💰 預計加碼：**{bonus_pts} 點**")
+                    st.write(f"時間：{auto_pts} 分鐘")
+                    st.write(f"可核發：**{bonus_pts} 點**")
                 with c4:
                     if st.button("核可發放", key=f"appv_{idx}"):
                         st.balloons()
                         st.success("點數已核發！")
+
