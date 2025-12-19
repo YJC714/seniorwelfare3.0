@@ -97,7 +97,7 @@ elif st.session_state.page == "處方箋管理":
         col1, col2 = st.columns(2)
         
         with col1:
-            selected_f_label = st.selectbox("臨床衰弱量表 (CFS) 評估", options=list(FRAILTY_LOGIC.keys()),index=list(FRAILTY_LOGIC.keys()).index(default_frailty_label)
+            selected_f_label = st.selectbox("臨床衰弱量表 (CFS) 評估", options=list(FRAILTY_LOGIC.keys()),index=list(FRAILTY_LOGIC.keys()).index(default_frailty_label))
             f_data = FRAILTY_LOGIC[selected_f_label]
             st.info(f"針對{selected_f_label}，建議運動：{', '.join(f_data['suggested'])}")
             
@@ -228,6 +228,7 @@ elif st.session_state.page == "運動回報核可":
                     else:
                         # 狀態 C：不符合處方
                         st.error("額外運動")
+
 
 
 
