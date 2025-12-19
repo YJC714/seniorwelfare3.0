@@ -131,7 +131,7 @@ elif st.session_state.page == "處方箋管理":
                 if ( h_row['frequency']=='0' and h_row['minute']=='0'):
                     st.write(f"運動處方箋： {h_row['content']}")
                     st.caption(f"備註：{h_row.get('other', '無')}")
-                else 
+                else:
                     st.write(f"運動處方箋： {h_row['content']}")
                     st.write(f"計畫： 每週 {h_row['frequency']} 次，每次 {h_row['minute']} 分鐘")
                     st.caption(f"備註：{h_row.get('other', '無')}")
@@ -217,6 +217,7 @@ elif st.session_state.page == "運動回報核可":
                     else:
                         # 狀態 C：不符合處方
                         st.error("額外運動")
+
 
 
 
