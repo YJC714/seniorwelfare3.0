@@ -672,9 +672,11 @@ elif st.session_state.view == "運動場地":
                     st.write(f"{p['address']}")
                 
                 with col2:
-                    if p['name']=="成大銀髮健身俱樂部":
-                        map_url = f"https://www.google.com.tw/maps/search/北區仁愛里活動中心}"
+                    if p['name'] == "成大銀髮健身俱樂部":
+                        
+                        map_url = "https://www.google.com.tw/maps/search/北區仁愛里活動中心"
                     else:
+                        
                         map_url = f"https://www.google.com.tw/maps/search/{p['name']}"
                     
                     # 讓按鈕垂直置中（加一點空間）
@@ -718,4 +720,5 @@ elif st.session_state.view == "活動推廣":
                 
                 with col2:
                     st.write("")
+
 
