@@ -636,9 +636,24 @@ elif st.session_state.view == "點數兌換":
 
     st.divider()
     st.subheader("點數消費紀錄")
-    if st.session_state.redeemed:
-        df = pd.DataFrame(st.session_state.redeemed)
-        st.dataframe(df[["日期", "店家", "點數"]], use_container_width=True, hide_index=True)
+    if not user_redeem_history.empty:
+        # 整理成易讀的格式
+        display_history = user_redeem_history.rename(columns={
+            "content": "兌換品項",
+            "store_name": "兌換店家",
+            "point_redeemed": "使用點數"
+        })
+        # 依照日期排序（如果有日期欄位的話）
+        if 'date' in display_history.columns:
+            display_history = display_history.sort_values("date", ascending=False)
+            
+        st.dataframe(
+            display_history[["兌換品項", "兌換店家", "使用點數"]], 
+            use_container_width=True, 
+            hide_index=True
+        )
+    else:
+        st.info("尚無兌換紀錄，快去運動賺點數吧！")
 
 
 # ────────────────────── 運動場地──────────────────────
@@ -720,5 +735,6 @@ elif st.session_state.view == "活動推廣":
                 
                 with col2:
                     st.write("")
+
 
 
