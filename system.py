@@ -593,6 +593,22 @@ elif st.session_state.view == "運動紀錄":
 # ────────────────────── 點數兌換 ──────────────────────
 elif st.session_state.view == "點數兌換":
     back_to_home()
+    # --- 1. 讀取資料 (這裡就是解決 NameError 的地方) ---
+    user_redeem_history = pd.DataFrame() # 建立預設空表
+    
+    try:
+        # 直接從 GSheet 讀取
+        df_all_redeem = conn.read(worksheet="redeem_report", header=0)
+        
+        if df_all_redeem is not None and not df_all_redeem.empty:
+            # 欄位名稱標準化
+            df_all_redeem.columns = [c.strip().lower() for c in df_all_redeem.columns]
+            
+            # 確保 ID 匹配 (強制轉為字串比較)
+            df_all_redeem['patient_num'] = df_all_redeem['patient_num'].astype(str)
+            user_redeem_history = df_all_redeem[df_all_redeem['patient_num'] == str(CURRENT_PATIENT_ID)].copy()
+    except Exception as e:
+        st.warning(f"暫時無法連線至兌換資料庫: {e}")
     # ===== NEW: 節省金額計算 =====
     total_redeemed_points = sum(r["點數"] for r in st.session_state.redeemed)
     CONVERSION_RATE_POINTS_PER_TWD = 10 # 假設 10 點 = 1 元
@@ -735,6 +751,7 @@ elif st.session_state.view == "活動推廣":
                 
                 with col2:
                     st.write("")
+
 
 
 
