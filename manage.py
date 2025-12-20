@@ -78,6 +78,36 @@ elif st.session_state.page == "處方箋管理":
     p_info = df_p[df_p['patient_num'].astype(str) == target_pid].iloc[0]
     
     st.header(f"運動處方箋管理：{p_info['name']}")
+
+    # 取得個管師負責的所有病人，準備下拉選單
+    my_patients = df_p[df_p['case_manager'] == CASE_MANAGER_NAME].copy()
+    my_patients['display'] = my_patients['name'] + " (ID: " + my_patients['patient_num'].astype(str) + ")"
+    patient_options = my_patients['display'].tolist()
+    patient_ids = my_patients['patient_num'].astype(str).tolist()
+
+    # 預設選中：優先用從病人列表點進來的 selected_pid
+    default_index = 0
+    if "selected_pid" in st.session_state:
+        try:
+            default_index = patient_ids.index(st.session_state.selected_pid)
+        except ValueError:
+            pass
+
+    # 下拉選單選病人
+    selected_display = st.selectbox(
+        "請選擇要開立處方箋的長者",
+        options=patient_options,
+        index=default_index
+    )
+
+    # 取得對應的 patient_num
+    selected_idx = patient_options.index(selected_display)
+    target_pid = patient_ids[selected_idx]
+
+    # 取得病人資訊
+    p_info = df_p[df_p['patient_num'].astype(str) == target_pid].iloc[0]
+    
+    st.subheader(f"目前管理對象：{p_info['name']} (病歷號：{target_pid})")
     
     patient_history = df_pres[df_pres['patient_num'].astype(str) == target_pid].sort_values(by="prescription_date", ascending=False)
         # 根據 patients 表的 frailty_level 自動設定下拉選單預設值
@@ -237,6 +267,7 @@ elif st.session_state.page == "運動回報核可":
                     else:
                         # 狀態 C：不符合處方
                         st.error("額外運動")
+
 
 
 
